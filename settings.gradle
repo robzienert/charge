@@ -1,0 +1,37 @@
+import groovy.io.FileType
+import groovy.io.FileVisitResult
+
+rootProject.name = 'charge'
+
+def skippedDirs = ['buildSrc', 'gradle']
+
+def path = [] as LinkedList
+rootDir.traverse(
+        type: FileType.FILES,
+        nameFilter: ~/.*\.gradle/,
+        maxDepth: 3,
+        preDir: {
+            path << it.name
+            if (skippedDirs.contains(it.name)) {
+                return FileVisitResult.SKIP_SUBTREE
+            }
+        },
+        postDir: { path.removeLast() }
+) {
+    if (path) {
+        include path.join(':')
+    }
+}
+
+rootProject.children.each { project ->
+    setSubprojectBuildFile(project)
+}
+
+void setSubprojectBuildFile(def project) {
+    String fileBaseName = project.name.replaceAll("\\p{Upper}") { "-${it.toLowerCase()}"}
+    project.buildFileName = "${fileBaseName}.gradle"
+    assert project.buildFile.isFile()
+    project.children.each { subproject ->
+        setSubprojectBuildFile(subproject)
+    }
+}
