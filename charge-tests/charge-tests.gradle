@@ -1,0 +1,16 @@
+apply plugin: 'groovy'
+apply plugin: 'scala'
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+}
+
+dependencies {
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    compile "org.scala-lang:scala-library:${scalaVersion}"
+
+    compile project(':charge-core')
+}

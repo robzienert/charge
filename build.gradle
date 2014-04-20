@@ -1,11 +1,31 @@
-apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'build-dashboard'
 
-version = '0.1'
+allprojects {
+    version = '0.0.1'
 
-repositories {
-    jcenter()
+    configurations.all {
+        resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+            if (details.requested.name == 'groovy') {
+                details.useTarget group: details.requested.group, name: 'groovy-all', version: groovyVersion
+            }
+            if (details.requested.name == 'groovy-all') {
+                details.useVersion groovyVersion
+            }
+            if (details.requested.name == 'spock-core') {
+                details.useVersion spockVersion
+            }
+        }
+    }
+
+    task wrapper(type: Wrapper) {
+        gradleVersion = '1.9'
+    }
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+idea {
+    project {
+        jdkName = '1.7'
+        languageLevel = '1.7'
+    }
 }

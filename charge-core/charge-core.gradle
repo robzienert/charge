@@ -1,9 +1,36 @@
-apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'scala'
+
+tasks.withType(ScalaCompile) {
+    scalaCompileOptions.useAnt = false
+}
 
 repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    mavenLocal()
+    jcenter()
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+
+    // Framework
+    compile "org.spockframework:spock-core:${spockVersion}"
+    compile "org.spockframework:spock-guice:${spockVersion}"
+    compile 'com.google.guava:guava:16.0.1'
+    compile 'com.google.inject:guice:3.0'
+    compile 'org.slf4j:slf4j-api:1.7.2'
+    compile 'ch.qos.logback:logback-classic:1.0.9'
+    compile 'org.yaml:snakeyaml:1.13'
+    compile 'org.codehaus.gpars:gpars:1.1.0'
+
+    // Gatling
+    compile "org.scala-lang:scala-library:${scalaVersion}"
+    compile("io.gatling.highcharts:gatling-charts-highcharts:${gatlingVersion}") {
+        exclude group: 'com.ning', module: 'async-http-client' // issues getting the correct AHC
+    }
+    compile 'com.ning:async-http-client:1.8.7'
+
+    testCompile "junit:junit:${junitVersion}"
 }
